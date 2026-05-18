@@ -1,18 +1,9 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -20,7 +11,6 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -28,83 +18,99 @@ export function LoginForm({
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const supabase = createClient();
     setIsLoading(true);
     setError(null);
 
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) throw error;
-      // Update this route to redirect to an authenticated route. The user already has an active session.
-      router.push("/protected");
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
+    const res = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password }),
+    });
+
+    if (res.ok) {
+      router.push("/admin");
+    } else {
+      setError("Mot de passe incorrect.");
     }
+
+    setIsLoading(false);
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>
-            Enter your email below to login to your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin}>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <Link
-                    href="/auth/forgot-password"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </Link>
-                </div>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Logging in..." : "Login"}
-              </Button>
+    <div
+      className={cn("flex flex-col gap-6", className)}
+      {...props}
+      style={{ fontFamily: "'Georgia', serif" }}
+    >
+      <div className="text-center mb-2">
+        <div style={{
+          display: "inline-flex", alignItems: "center", justifyContent: "center",
+          width: 56, height: 56, borderRadius: "50%", background: "#F5C400",
+          marginBottom: 12, boxShadow: "0 4px 16px rgba(245,196,0,0.35)",
+        }}>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L3 6v6c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V6L12 2z" fill="#1a1a1a"/>
+            <path d="M9 12l2 2 4-4" stroke="#F5C400" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+        <h1 style={{ fontSize: 22, fontWeight: 700, color: "#1a1a1a", letterSpacing: "-0.03em", margin: 0 }}>
+          ProDératisation
+        </h1>
+        <p style={{ fontSize: 13, color: "#888", marginTop: 4, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+          Espace administration
+        </p>
+      </div>
+
+      <div style={{
+        background: "#fff", border: "1.5px solid #F5C400", borderRadius: 16,
+        padding: "32px 28px", boxShadow: "0 8px 32px rgba(245,196,0,0.12), 0 2px 8px rgba(0,0,0,0.06)",
+      }}>
+        <form onSubmit={handleLogin}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <Label htmlFor="password" style={{ fontSize: 13, fontWeight: 600, color: "#333" }}>
+                Mot de passe admin
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                style={{ border: "1.5px solid #e5e5e5", borderRadius: 8, padding: "10px 14px", fontSize: 14 }}
+                onFocus={(e) => (e.target.style.borderColor = "#F5C400")}
+                onBlur={(e) => (e.target.style.borderColor = "#e5e5e5")}
+              />
             </div>
-            <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{" "}
-              <Link
-                href="/auth/sign-up"
-                className="underline underline-offset-4"
-              >
-                Sign up
-              </Link>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+
+            {error && (
+              <p style={{
+                fontSize: 13, color: "#c0392b", background: "#fdf2f2",
+                border: "1px solid #f5c6cb", borderRadius: 6, padding: "8px 12px", margin: 0,
+              }}>
+                {error}
+              </p>
+            )}
+
+            <Button
+              type="submit"
+              disabled={isLoading}
+              style={{
+                background: "#F5C400", color: "#1a1a1a", fontWeight: 700,
+                fontSize: 14, border: "none", borderRadius: 8, padding: "12px",
+                cursor: isLoading ? "not-allowed" : "pointer",
+                boxShadow: "0 2px 8px rgba(245,196,0,0.3)",
+              }}
+            >
+              {isLoading ? "Connexion en cours…" : "Se connecter"}
+            </Button>
+          </div>
+        </form>
+      </div>
+
+      <p style={{ textAlign: "center", fontSize: 12, color: "#bbb", margin: 0 }}>
+        Accès réservé — ProDératisation © {new Date().getFullYear()}
+      </p>
     </div>
   );
 }

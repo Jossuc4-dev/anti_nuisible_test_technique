@@ -7,7 +7,6 @@ export default function Home() {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
 
   useEffect(() => {
-    // Vérifier si l'admin est connecté via cookie
     fetch('/api/admin/check')
       .then(res => res.json())
       .then(data => setIsAdminLoggedIn(data.loggedIn))
