@@ -21,14 +21,14 @@ export function LoginForm({
     setIsLoading(true);
     setError(null);
 
-    const res = await fetch("/api/admin/login", {
+    const res = await fetch("/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ password }),
     });
 
     if (res.ok) {
-      router.push("/admin");
+      router.push("/admin/devis");
     } else {
       setError("Mot de passe incorrect.");
     }
@@ -109,7 +109,7 @@ export function LoginForm({
       </div>
 
       <p style={{ textAlign: "center", fontSize: 12, color: "#bbb", margin: 0 }}>
-        Accès réservé — ProDératisation © {new Date().getFullYear()}
+        Accès réservé — ProDératisation © 2026
       </p>
     </div>
   );

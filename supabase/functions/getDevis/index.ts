@@ -8,7 +8,7 @@ export default {
     const adminToken = req.headers.get("X-Admin-Token") || req.headers.get("x-admin-token");
     
     // Vérifier avec le mot de passe statique
-    const adminPassword = Deno.env.get("ADMIN_PASSWORD");
+    const adminPassword = Deno.env.get("NEXT_ADMIN_PASSWORD");
     
     if (!adminToken || adminToken !== adminPassword) {
       return Response.json(

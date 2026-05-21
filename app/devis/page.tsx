@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { sendDevisEmail } from '../api/email/route';
+import { sendDevisEmail } from '@/lib/email';
 
 const ETABLISSEMENTS = ['Restaurant', 'Hôtel', 'Copropriété', 'Autre'];
 const NUISIBLES = ['Rats', 'Cafards', 'Punaises de lit', 'Frelons', 'Autre'];
@@ -114,12 +114,11 @@ export default function DevisPage() {
       });
       const json = await res.json();
       if (!res.ok) {
-	console.log(res)
         setServerError(json.errors?.join(' ') || json.error || 'Erreur inattendue.');
       } else {
-        const sendEmail = await sendDevisEmail(form.email)
-        console.log(sendEmail)
-        setResult(json);
+        const sendEmail = await sendDevisEmail(form.email);
+        console.log(sendEmail);
+        setResult({ id: json.devis_id });
         scrollTop();
       }
     } catch {
@@ -193,9 +192,6 @@ export default function DevisPage() {
                     ${active ? 'text-amber-400' : done ? 'text-emerald-400' : 'text-stone-600'}`}>
                     {label}
                   </span>
-                  {idx < 3 && (
-                    <div className={`absolute hidden`} />
-                  )}
                 </div>
               );
             })}
@@ -218,7 +214,6 @@ export default function DevisPage() {
               </h1>
               <p className="text-stone-500 mb-8">Décrivez votre site et les nuisibles présents.</p>
 
-              {/* Type d'établissement */}
               <div className="mb-6">
                 <label className="block text-stone-300 text-sm font-semibold mb-3">
                   Type d'établissement <span className="text-amber-500">*</span>
@@ -248,7 +243,6 @@ export default function DevisPage() {
                 )}
               </div>
 
-              {/* Surface */}
               <div className="mb-6">
                 <label htmlFor="surface" className="block text-stone-300 text-sm font-semibold mb-2">
                   Surface du site (m²) <span className="text-amber-500">*</span>
@@ -263,7 +257,6 @@ export default function DevisPage() {
                     onChange={e => update('surface', e.target.value)}
                     placeholder="Ex : 250"
                     aria-invalid={!!errors.surface}
-                    aria-describedby={errors.surface ? 'surface-error' : undefined}
                     className="w-full bg-stone-800 border border-stone-700 text-white rounded-xl px-4 py-3 pr-12
                       focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent
                       placeholder-stone-600 transition-all"
@@ -271,11 +264,10 @@ export default function DevisPage() {
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-500 text-sm">m²</span>
                 </div>
                 {errors.surface && (
-                  <p id="surface-error" role="alert" className="text-red-400 text-xs mt-2">{errors.surface}</p>
+                  <p role="alert" className="text-red-400 text-xs mt-2">{errors.surface}</p>
                 )}
               </div>
 
-              {/* Nuisibles */}
               <div className="mb-6">
                 <label className="block text-stone-300 text-sm font-semibold mb-3">
                   Type(s) de nuisible(s) <span className="text-amber-500">*</span>
@@ -348,7 +340,6 @@ export default function DevisPage() {
                 <p role="alert" className="text-red-400 text-xs">{errors.urgence}</p>
               )}
 
-              {/* Récap étape 1 */}
               <div className="bg-stone-800/60 rounded-2xl p-4 mt-8 border border-stone-700/50">
                 <p className="text-stone-500 text-xs font-semibold uppercase tracking-widest mb-3">Récapitulatif</p>
                 <div className="space-y-1 text-sm">
@@ -378,7 +369,6 @@ export default function DevisPage() {
               <p className="text-stone-500 mb-8">Nous vous contacterons dans les meilleurs délais.</p>
 
               <div className="space-y-5">
-                {/* Nom */}
                 <div>
                   <label htmlFor="nom" className="block text-stone-300 text-sm font-semibold mb-2">
                     Nom du contact <span className="text-amber-500">*</span>
@@ -397,7 +387,6 @@ export default function DevisPage() {
                   {errors.nom && <p role="alert" className="text-red-400 text-xs mt-1.5">{errors.nom}</p>}
                 </div>
 
-                {/* Email */}
                 <div>
                   <label htmlFor="email" className="block text-stone-300 text-sm font-semibold mb-2">
                     Email <span className="text-amber-500">*</span>
@@ -416,7 +405,6 @@ export default function DevisPage() {
                   {errors.email && <p role="alert" className="text-red-400 text-xs mt-1.5">{errors.email}</p>}
                 </div>
 
-                {/* Téléphone */}
                 <div>
                   <label htmlFor="telephone" className="block text-stone-300 text-sm font-semibold mb-2">
                     Téléphone <span className="text-amber-500">*</span>
@@ -435,7 +423,6 @@ export default function DevisPage() {
                   {errors.telephone && <p role="alert" className="text-red-400 text-xs mt-1.5">{errors.telephone}</p>}
                 </div>
 
-                {/* Message */}
                 <div>
                   <label htmlFor="message" className="block text-stone-300 text-sm font-semibold mb-2">
                     Message <span className="text-stone-600 font-normal">(optionnel)</span>
@@ -447,14 +434,13 @@ export default function DevisPage() {
                     placeholder="Informations complémentaires, accès, contraintes particulières..."
                     rows={4}
                     maxLength={500}
-                    aria-describedby="message-count"
                     className="w-full bg-stone-800 border border-stone-700 text-white rounded-xl px-4 py-3
                       focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent
                       placeholder-stone-600 resize-none transition-all"
                   />
                   <div className="flex justify-between items-center mt-1">
                     <span>{errors.message && <p role="alert" className="text-red-400 text-xs">{errors.message}</p>}</span>
-                    <span id="message-count" className={`text-xs ${form.message.length > 450 ? 'text-amber-400' : 'text-stone-600'}`}>
+                    <span className={`text-xs ${form.message.length > 450 ? 'text-amber-400' : 'text-stone-600'}`}>
                       {form.message.length}/500
                     </span>
                   </div>

@@ -7,7 +7,15 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 // Client public (lecture seule côté client)
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Client admin avec service_role (accès complet, serveur uniquement)
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: { persistSession: false },
+// Client admin — créé à la demande pour éviter l'erreur au build
+export const getSupabaseAdmin = () =>
+  createClient(supabaseUrl, supabaseServiceKey, {
+    auth: { persistSession: false },
+  });
+
+// Rétrocompatibilité (lazy)
+export const supabaseAdmin = new Proxy({} as ReturnType<typeof createClient>, {
+  get(_, prop) {
+    return getSupabaseAdmin()[prop as keyof ReturnType<typeof createClient>];
+  },
 });

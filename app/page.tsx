@@ -27,7 +27,7 @@ export default function Home() {
           <div className="flex items-center gap-3">
             {isAdminLoggedIn ? (
               <Link
-                href="/admin"
+                href="/admin/devis"
                 className="bg-gray-900 hover:bg-gray-800 text-white font-semibold px-5 py-2.5 rounded-full text-sm transition-colors"
               >
                 Tableau de bord
