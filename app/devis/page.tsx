@@ -116,7 +116,7 @@ export default function DevisPage() {
       if (!res.ok) {
         setServerError(json.errors?.join(' ') || json.error || 'Erreur inattendue.');
       } else {
-        const sendEmail = await sendDevisEmail(form.email);
+        const sendEmail = await sendDevisEmail(form.email, json.devis_id);
         console.log(sendEmail);
         setResult({ id: json.devis_id });
         scrollTop();

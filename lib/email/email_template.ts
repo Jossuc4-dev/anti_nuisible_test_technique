@@ -1,4 +1,4 @@
-export const devisEmailHtml = `
+export const devisEmailHtml = (id_devis:string)=>`
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -36,6 +36,11 @@ export const devisEmailHtml = `
                   </td>
                 </tr>
               </table>
+
+              <!-- Identifiant de la demande -->
+              <p style="margin:0 0 16px 0;font-size:13px;color:#9ca3af;font-family:Arial,sans-serif;text-align:center;">
+                Votre identifiant de demande : <strong style="color:#1a1a1a;">${id_devis}</strong>
+              </p>
 
               <h1 style="margin:0 0 16px 0;font-size:26px;color:#1a1a1a;font-family:Georgia,serif;font-weight:700;line-height:1.3;text-align:center;">
                 Merci pour votre demande de devis
